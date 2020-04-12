@@ -34,13 +34,12 @@ const userSchema = mongoose.Schema({
     department: {
         type: mongoose.Schema.Types.ObjectId,
         ref: Department,
-        required: true,
         trim: true
     },
     role: {
         type: String,
-        required: true,
-        enum: [Admin, User]
+        enum: ["admin", "user"],
+        default: "user"
     },
 
     hash: String,
@@ -74,7 +73,10 @@ userSchema.methods.generateJwt = () => {
         email: this.email,
         firstName: this.firstName,
         lastName: this.lastName,
+        officialOf: this.officialOf,
+        government: this.government,
         department: this.department,
+        role: this.role,
         exp: parseInt(expiry.getTime() / 1000)
 
 
