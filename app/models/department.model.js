@@ -1,10 +1,12 @@
 const mongoose = require("mongoose");
 
+
 const departmentSchema = mongoose.Schema(
     {
         name: {
             type: String,
-            required: true
+            required: true,
+            trim: true
         }
     }
 );

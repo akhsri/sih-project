@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const User = require("./user.model");
 
-const messageSchema = mongoose.messageSchema(
+const messageSchema = mongoose.Schema(
     {
         sender: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: User,
+            ref: "User",
             required: true
         },
         text: {
@@ -14,7 +14,7 @@ const messageSchema = mongoose.messageSchema(
         },
         channel: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: User,
+            ref: "Channel",
             required: true
         }
     },

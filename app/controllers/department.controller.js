@@ -5,19 +5,29 @@ module.exports.create = (req, res) => {
 
     department.name = req.body.name;
 
-    department
-        .save()
-        .then(department => {
-            res.status(200);
-            res.json({
-                department: department
+    console.log("user: ", req.user);
+    //console.log("department name: ", department.name);
+    console.log("role: ", req.user.role);
+    if (req.user.role === "admin") {
+        department
+            .save()
+            .then(department => {
+                res.status(200);
+                res.json({
+                    department: department
+                })
             })
-        })
-        .catch(error => {
-            res.status(500).json({
-                error: error
+            .catch(error => {
+                res.status(500).json({
+                    error: error
+                })
             })
+    } else {
+        res.json({
+            message: "User is not a admin."
         })
+    }
+
 }
 
 

@@ -33,6 +33,7 @@ const userSchema = mongoose.Schema({
     },
     department: {
         type: mongoose.Schema.Types.ObjectId,
+        required: false,
         ref: Department,
         trim: true
     },
@@ -50,32 +51,28 @@ const userSchema = mongoose.Schema({
         timestamps: true
     });
 
-userSchema.methods.setPassword = (password) => {
+userSchema.methods.setPassword = function (password) {
     this.salt = crypto.randomBytes(16).toString("hex");
     this.hash = crypto
         .pbkdf2Sync(password, this.salt, 1000, 64, "sha512")
         .toString("hex");
 };
 
-userSchema.methods.validPassword = (password) => {
+userSchema.methods.validPassword = function (password) {
     var hash = crypto
         .pbkdf2Sync(password, this.salt, 1000, 64, "sha512")
         .toString("hex");
     return this.hash === hash;
 }
 
-userSchema.methods.generateJwt = () => {
+userSchema.methods.generateJwt = function () {
     var expiry = new Date();
     expiry.setDate(expiry.getDate() + 7);
-
+    console.log("email: ", this.email);
+    console.log("firstName: ", this.firstName);
     return jwt.sign({
         _id: this._id,
-        email: this.email,
-        firstName: this.firstName,
-        lastName: this.lastName,
         officialOf: this.officialOf,
-        government: this.government,
-        department: this.department,
         role: this.role,
         exp: parseInt(expiry.getTime() / 1000)
 

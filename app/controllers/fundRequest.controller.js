@@ -6,8 +6,9 @@ module.exports.create = (req, res) => {
 
     request.requestTo = req.body.requestTo;
     request.requestFrom = req.body.requestFrom;
+    request.schemeId = req.body.schemeId;
     request.requestState = req.body.requestState;
-
+    console.log("req.user: ", req.user);
     request
         .save()
         .then(request => {
@@ -24,7 +25,7 @@ module.exports.create = (req, res) => {
 
         })
 }
-// Find all requests in the database
+// Find all fund requests in the database
 exports.findAll = (req, res) => {
     fundRequest.find()
         .then(requests => {
@@ -36,9 +37,11 @@ exports.findAll = (req, res) => {
         });
 };
 
-// Find a request with a request id
+// Find a fund request with a request id
 exports.findOne = (req, res) => {
-    fundRequest.findById(req.request._id)
+    fundRequest.findById({
+        _id: req.params.requestId
+    })
         .then(request => {
             if (!request) {
                 return res.status(404).send({
@@ -59,6 +62,81 @@ exports.findOne = (req, res) => {
         })
 }
 
+// Update a fund request
+exports.update = (req, res) => {
+    if (!req.body.requestState) {
+        return res.status(400).send({
+            message: "Request state can not be empty"
+        })
+    }
+
+    if (req.body.requestFrom || req.body.requestTo || req.body.schemeId) {
+        return res.status(401).send({
+            message: "User not authorized to update any other fields than requestState"
+        })
+    }
+
+
+    fundRequest.findById(req.params.requestId)
+        .then(request => {
+            if (!request) {
+                return res.status(404).send({
+                    message: "Fund request not found with id " + req.params.requestId
+                })
+            }
+            console.log(" in find by id function", request);
+            var receiverID = request.requestTo;
+            console.log("recieverID: ", receiverID);
+            console.log("req.user._id: ", req.user._id);
+            //res.send(request);
+            if (req.user._id == receiverID) {
+                fundRequest.findByIdAndUpdate(req.params.requestId, {
+                    requestState: req.body.requestState
+                }, { new: true })
+                    .then(request => {
+                        if (!request) {
+                            return res.status(404).send({
+                                message: "Fund request not found with id " + req.params.requestId
+                            });
+                        }
+                        //console.log("req.user: ", req.user);
+                        console.log("new state: ", request.requestState);
+                        res.send(request);
+
+                    })
+                    .catch(err => {
+                        if (err.kind === "ObjectId") {
+                            return res.status(404).send({
+                                message: "Fund request not found with id " + req.params.requestId
+                            });
+                        }
+                    })
+            }
+            else {
+                console.log("User does not have authorization to change fund request status");
+                res.status(403).send({
+                    message: "User does not have authorization to change fund request status"
+                })
+            }
+
+        })
+        .catch(err => {
+            if (err.kind === "ObjectId") {
+                return res.status(404).send({
+                    message: "Fund request not found with id " + req.params.requestId
+                });
+            }
+        })
+
+
+    //console.log("req.user: ", req.user);
+    //console.log("req.body: ", req.body);
+    //console.log("receiverID2: ", receiverID)
+
+
+
+
+}
 
 // Delete a request
 exports.delete = (req, res) => {

@@ -42,17 +42,25 @@ app.get("/", (req, res) => {
 // .....
 app.use(passport.initialize());
 
-// Require Department routes
-require("./app/routes/department.routes")(app);
+
 
 // Require users route
 require("./app/routes/user.routes")(app);
+
+// Require Department routes
+require("./app/routes/department.routes")(app);
 
 // Require schemes route
 require("./app/routes/scheme.routes")(app);
 
 // Require Fund request routes
 require("./app/routes/fundRequest.routes")(app);
+
+// Require Channel routes
+require("./app/routes/channel.routes")(app);
+
+// Require message routes
+require("./app/routes/message.routes")(app);
 
 
 

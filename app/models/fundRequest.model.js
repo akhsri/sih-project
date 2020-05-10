@@ -12,6 +12,11 @@ const fundRequestSchema = mongoose.Schema({
         ref: User,
         required: true
     },
+    schemeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Scheme",
+        required: true
+    },
     requestState: {
         type: String,
         enum: ["Pending", "Approved", "Denied"],

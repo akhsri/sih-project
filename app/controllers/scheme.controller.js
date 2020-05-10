@@ -12,22 +12,29 @@ module.exports.register = function (req, res) {
     scheme.schemeName = req.body.schemeName;
     scheme.content = req.body.content;
 
-    scheme.
-        save()
-        .then(scheme => {
+    console.log("req.user: ", req.user);
+    if (req.user.officialOf === "Center") {
+        scheme.
+            save()
+            .then(scheme => {
 
-            res.status(200);
-            res.json({
-                scheme: scheme
-            })
+                res.status(200);
+                res.json({
+                    scheme: scheme
+                })
 
-        })
-        .catch(error => {
-            res.status(500).json({
-                error: error
             })
-            console.log("error: ", res.error);
+            .catch(error => {
+                res.status(500).json({
+                    error: error
+                })
+                console.log("error: ", res.error);
+            })
+    } else {
+        res.json({
+            message: "You are not a center official. Only center officials can create schemes."
         })
+    }
 }
 
 // Find all schemes in the database
@@ -47,11 +54,13 @@ exports.findAll = (req, res) => {
 // Find a specific scheme in the database using scheme ID
 
 exports.findOne = (req, res) => {
-    Scheme.findById(req.scheme._id)
+    Scheme.findById({
+        _id: req.params.schemeId
+    })
         .then(scheme => {
             if (!scheme) {
                 return res.status(404).send({
-                    message: "Scheme not found with id " + req.scheme._id
+                    message: "Scheme not found with id " + req.params.schemeId
                 })
             }
             res.send(scheme)
@@ -59,11 +68,11 @@ exports.findOne = (req, res) => {
         .catch(err => {
             if (err.kind === "ObjectId") {
                 return res.status(404).send({
-                    message: "Scheme not found with id " + req.scheme._id
+                    message: "Scheme not found with id " + req.params.schemeId
                 });
             }
             return res.status(500).send({
-                message: "Error retreiving scheme with id " + req.scheme._id
+                message: "Error retreiving scheme with id " + req.params.schemeId
             });
         });
 };

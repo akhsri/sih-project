@@ -10,12 +10,15 @@ var sendJSONresponse = function (res, status, content) {
 
 module.exports.register = function (req, res) {
     var user = new User();
-
+    console.log("req.body: ", req.body);
     user.firstName = req.body.firstName;
     user.lastName = req.body.lastName;
     user.department = req.body.department;
     user.email = req.body.email;
-    user._id = req.body._id;
+    user.officialOf = req.body.officialOf;
+    user.government = req.body.government;
+    user.role = req.body.role;
+    //user._id = req.body._id;
     user.setPassword(req.body.password)
     user.
         save()
@@ -32,6 +35,7 @@ module.exports.register = function (req, res) {
             res.status(500).json({
                 error: error
             })
+            console.log("error: ", error);
         })
 }
 
